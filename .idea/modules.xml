@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/borderpasswebservice.iml" filepath="$PROJECT_DIR$/.idea/modules/borderpasswebservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/borderpasswebservice_main.iml" filepath="$PROJECT_DIR$/.idea/modules/borderpasswebservice_main.iml" group="borderpasswebservice" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/borderpasswebservice_test.iml" filepath="$PROJECT_DIR$/.idea/modules/borderpasswebservice_test.iml" group="borderpasswebservice" />
+    </modules>
+  </component>
+</project>
