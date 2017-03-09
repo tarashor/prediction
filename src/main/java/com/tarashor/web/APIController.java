@@ -28,19 +28,26 @@ public class APIController {
         this.dataRepository = dataRepository;
     }
 
-    @RequestMapping(value = "/stat", produces="application/json", method = GET)
+    @RequestMapping(value = "/stat", produces="application/json;charset=UTF-8", method = GET)
     public @ResponseBody List<StatisticItem> statistics(@RequestParam(value="pass", defaultValue = "")String pass,
                                                         @RequestParam(value="start", defaultValue = "-1")long startDateMilliseconds,
                                                         @RequestParam(value="end", defaultValue = "-1")long endDateMilliseconds,
                                                         @RequestParam(value="max", defaultValue = "20")int max){
         Calendar calendar = Calendar.getInstance();
-        Date now = calendar.getTime();
-        calendar.add(Calendar.DATE, -14);
-        Date twoWeeksAgo = calendar.getTime();
-        Date endDate = now;
-        Date startDate = twoWeeksAgo;
-        if (startDateMilliseconds > 0){}
-        if (endDateMilliseconds > 0){}
+
+        if (endDateMilliseconds > 0){
+            calendar.setTimeInMillis(endDateMilliseconds);
+        }
+        Date endDate = calendar.getTime();
+
+        if (startDateMilliseconds > 0){
+            calendar.setTimeInMillis(startDateMilliseconds);
+        } else {
+            calendar.setTime(endDate);
+            calendar.set(Calendar.DATE, -14);
+        }
+        Date startDate = calendar.getTime();
+
         return dataRepository.getStatisticsForPass(pass, startDate, endDate, max);
     }
 }
