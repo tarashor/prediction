@@ -50,4 +50,9 @@ public class APIController {
 
         return dataRepository.getStatisticsForPass(pass, startDate, endDate, max);
     }
+
+    @RequestMapping(value = "/passes", produces="application/json;charset=UTF-8", method = GET)
+    public @ResponseBody List<String> passes(){
+        return dataRepository.getPasses();
+    }
 }

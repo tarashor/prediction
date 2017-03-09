@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -18,11 +17,13 @@ import java.util.List;
 @Repository
 public class JdbcStatisticsRepository implements IStatisticsRepository {
 
-    public static final String SELECT_ITEMS_QUERY = "select * from borderstat.stat where pass_name = ? and date >= ? and date <= ?;";
-    public static final String PASS_COLUMN_NAME = "pass_name";
-    public static final String CARS_ON_BORDER_COLUMN_NAME = "car_count_on";
-    public static final String CARS_BEFORE_BORDER_COLUMN_NAME = "car_count_before";
-    public static final String DATE_COLUMN_NAME = "date";
+    private static final String PASS_COLUMN_NAME = "pass_name";
+    private static final String CARS_ON_BORDER_COLUMN_NAME = "car_count_on";
+    private static final String CARS_BEFORE_BORDER_COLUMN_NAME = "car_count_before";
+    private static final String DATE_COLUMN_NAME = "date";
+    private static final String SELECT_STAT_ITEMS_QUERY = "select * from borderstat.stat where pass_name = ? and date >= ? and date <= ? order by date desc limit ?;";
+
+    private static final java.lang.String SELECT_DISTINCT_PASSES = "SELECT DISTINCT pass_name FROM borderstat.stat;";
 
     private JdbcOperations jdbcOperations;
 
@@ -33,7 +34,12 @@ public class JdbcStatisticsRepository implements IStatisticsRepository {
 
     @Override
     public List<StatisticItem> getStatisticsForPass(String passName, Date startDate, Date endDate, int max) {
-        return jdbcOperations.query(SELECT_ITEMS_QUERY, new StatisticItemRowMapper(), passName, startDate, endDate);
+        return jdbcOperations.query(SELECT_STAT_ITEMS_QUERY, new StatisticItemRowMapper(), passName, startDate, endDate, max);
+    }
+
+    @Override
+    public List<String> getPasses() {
+        return jdbcOperations.queryForList(SELECT_DISTINCT_PASSES, String.class);
     }
 
     private static class StatisticItemRowMapper implements RowMapper<StatisticItem> {

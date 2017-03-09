@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * Created by Taras on 3/8/2017.
@@ -28,6 +29,10 @@ public class DBConfig {
         dataSource.setUrl(env.getRequiredProperty("dataSource.url"));
         dataSource.setUsername(env.getRequiredProperty("dataSource.username"));
         dataSource.setPassword(env.getRequiredProperty("dataSource.password"));
+        Properties properties = new Properties();
+        properties.setProperty("useUnicode","true");
+        properties.setProperty("characterEncoding","UTF-8");
+        dataSource.setConnectionProperties(properties);
         return dataSource;
     }
 
