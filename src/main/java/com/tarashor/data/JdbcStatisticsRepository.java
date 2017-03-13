@@ -21,7 +21,8 @@ public class JdbcStatisticsRepository implements IStatisticsRepository {
     private static final String CARS_ON_BORDER_COLUMN_NAME = "car_count_on";
     private static final String CARS_BEFORE_BORDER_COLUMN_NAME = "car_count_before";
     private static final String DATE_COLUMN_NAME = "date";
-    private static final String SELECT_STAT_ITEMS_QUERY = "select * from borderstat.stat where pass_name = ? and date >= ? and date <= ? order by date desc limit ?;";
+    private static final String SELECT_STAT_ITEMS_MAX_QUERY = "select * from borderstat.stat where pass_name = ? and date >= ? and date <= ? order by date desc limit ?;";
+    private static final String SELECT_STAT_ITEMS_QUERY = "select * from borderstat.stat where pass_name = ? and date >= ? and date <= ? order by date desc;";
 
     private static final java.lang.String SELECT_DISTINCT_PASSES = "SELECT DISTINCT pass_name FROM borderstat.stat;";
 
@@ -34,7 +35,12 @@ public class JdbcStatisticsRepository implements IStatisticsRepository {
 
     @Override
     public List<StatisticItem> getStatisticsForPass(String passName, Date startDate, Date endDate, int max) {
-        return jdbcOperations.query(SELECT_STAT_ITEMS_QUERY, new StatisticItemRowMapper(), passName, startDate, endDate, max);
+        return jdbcOperations.query(SELECT_STAT_ITEMS_MAX_QUERY, new StatisticItemRowMapper(), passName, startDate, endDate, max);
+    }
+
+    @Override
+    public List<StatisticItem> getStatisticsForPass(String passName, Date startDate, Date endDate) {
+        return jdbcOperations.query(SELECT_STAT_ITEMS_QUERY, new StatisticItemRowMapper(), passName, startDate, endDate);
     }
 
     @Override

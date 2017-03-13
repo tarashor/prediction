@@ -11,13 +11,11 @@
         <meta name="description" content="">
         <meta name="author" content="">
         <link rel="icon" href="<c:url value="/resources/favicon.ico"/>">
-        <title>Starter Template for Bootstrap</title>
-        <!-- Bootstrap core CSS -->
+        <title>Statistic</title>
         <link href="<c:url value="/resources/css/bootstrap.min.css"/>" rel="stylesheet">
-        <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+        <link href="<c:url value="/resources/css/bootstrap-datetimepicker.min.css"/>" rel="stylesheet">
         <link href="<c:url value="/resources/css/ie10-viewport-bug-workaround.css"/>" rel="stylesheet">
-        <!-- Custom styles for this template -->
-        <link href="<c:url value="/resources/css/starter-template.css"/>" rel="stylesheet">
+
         <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
         <!--[if lt IE 9]>
         <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -25,7 +23,7 @@
         <![endif]-->
     </head>
 
-    <body>
+    <body style="padding-top: 80px;">
         <nav class="navbar navbar-inverse navbar-fixed-top">
             <div class="container">
                 <div class="navbar-header">
@@ -41,26 +39,33 @@
             </div>
         </nav>
         
-        <div class="container">
-            <div style="width:800px; margin: auto;">
-                <h3 id="historyChartTitle"></h3>
+        <div class="container" style="width:950px; margin: auto;">
+            <div>
+                <h4>Choose parameters</h4>
                 <form class="form-inline">
-                  <div class="form-group">
-                    <label class="sr-only" for="passes">Choose pass:</label>
-                    <select id="passes" class="form-control"></select>
-                  </div>
-<!--
-                  <div class="form-group">
-                    <label class="sr-only" for="exampleInputPassword3">Password</label>
-                    <input type="password" class="form-control" id="exampleInputPassword3" placeholder="Password">
-                  </div>
-                  <div class="checkbox">
-                    <label>
-                      <input type="checkbox"> Remember me
-                    </label>
-                  </div>
-                  <button type="submit" class="btn btn-default">Sign in</button>
--->
+                    <div class="form-group">
+                        <label for="passes">Pass:</label>
+                        <select id="passes" class="form-control"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="datetimepickerStart">Start date:</label>
+                        <div class='input-group date' id='datetimepickerStart'>
+                            <input type='text' class="form-control" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="datetimepickerEnd">End date:</label>
+                        <div class='input-group date' id='datetimepickerEnd'>
+                            <input type='text' class="form-control" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+
                 </form>
             </div>
             <canvas id="statisticChart" width="400" height="400"></canvas>
@@ -73,7 +78,9 @@
         </script>
 
         <script src="<c:url value="/resources/js/jquery.min.js"/>"></script>
+        <script src="<c:url value="/resources/js/moment.js"/>"></script>
         <script src="<c:url value="/resources/js/bootstrap.min.js"/>"></script>
+        <script src="<c:url value="/resources/js/bootstrap-datetimepicker.min.js"/>"></script>
         <script src="<c:url value="/resources/js/Chart.bundle.js"/>"></script>
         <script src="<c:url value="/resources/js/app.js"/>"></script>
         

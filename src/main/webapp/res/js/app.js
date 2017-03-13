@@ -74,14 +74,21 @@ function fillinPasses(options) {
     $("#passes").html(passesHtml);
 }
 
-function loadPassStatistic(passName) {
-    $.get(statUrl, { pass: passName }, function (res) {
-        res.reverse();
+function loadPassStatistic(passName, startDateMilliseconds, endDateMilliseconds) {
+    $.get(statUrl,
+        {
+            pass: passName,
+            start: startDateMilliseconds,
+            end: endDateMilliseconds
+        },
+        function (res) {
+            res.reverse();
             var l = [];
             var bb = [];
             var s = [];
             for (var i = 0; i < res.length; i++) {
-                l.push((new Date(res[i].date)).toISOString());
+                var dateStr = moment(res[i].date).format("D.MM.YYYY HH:mm");
+                l.push(dateStr);
                 bb.push(res[i].carsCountBeforeBorder);
                 s.push(res[i].carsCountBeforeBorder + res[i].carsCountOnBorder);
             }
@@ -92,13 +99,40 @@ function loadPassStatistic(passName) {
 function loadPassesList() {
     $.get(passesUrl, function (res) {
         fillinPasses(res);
-        loadPassStatistic($("#passes").val())
+        loadPassStatisticWithValues();
     });
 }
 
+function loadPassStatisticWithValues(){
+    loadPassStatistic($("#passes").val(), $('#datetimepickerStart').data("DateTimePicker").date().valueOf(), $('#datetimepickerEnd').data("DateTimePicker").date().valueOf())
+}
+
 $(document).ready(function () {
+    $('#datetimepickerStart').datetimepicker({
+        format: "DD.MM.YYYY"
+    });
+    $('#datetimepickerEnd').datetimepicker({
+        format: "DD.MM.YYYY",
+        useCurrent: false //Important! See issue #1075
+    });
+
+    var now = moment();
+    var twoWeeksAgo = moment().subtract(14, 'days');
+
+    $('#datetimepickerStart').data("DateTimePicker").date(twoWeeksAgo);
+    $('#datetimepickerEnd').data("DateTimePicker").date(now);
+
+    $("#datetimepickerStart").on("dp.change", function (e) {
+        $('#datetimepickerEnd').data("DateTimePicker").minDate(e.date);
+        loadPassStatisticWithValues();
+
+    });
+    $("#datetimepickerEnd").on("dp.change", function (e) {
+        $('#datetimepickerStart').data("DateTimePicker").maxDate(e.date);
+        loadPassStatisticWithValues();
+    });
     $("#passes").change(function () {
-        loadPassStatistic($(this).val())
+        loadPassStatisticWithValues();
     });
     var ctx2 = $("#statisticChart").get(0).getContext("2d");
     statisticChart = new Chart(ctx2, config);

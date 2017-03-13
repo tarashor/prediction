@@ -32,7 +32,7 @@ public class APIController {
     public @ResponseBody List<StatisticItem> statistics(@RequestParam(value="pass", defaultValue = "")String pass,
                                                         @RequestParam(value="start", defaultValue = "-1")long startDateMilliseconds,
                                                         @RequestParam(value="end", defaultValue = "-1")long endDateMilliseconds,
-                                                        @RequestParam(value="max", defaultValue = "20")int max){
+                                                        @RequestParam(value="max", defaultValue = "-1")int max){
         Calendar calendar = Calendar.getInstance();
 
         if (endDateMilliseconds > 0){
@@ -48,7 +48,11 @@ public class APIController {
         }
         Date startDate = calendar.getTime();
 
-        return dataRepository.getStatisticsForPass(pass, startDate, endDate, max);
+        if (max > 0){
+            return dataRepository.getStatisticsForPass(pass, startDate, endDate, max);
+        } else {
+            return dataRepository.getStatisticsForPass(pass, startDate, endDate);
+        }
     }
 
     @RequestMapping(value = "/passes", produces="application/json;charset=UTF-8", method = GET)
