@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/borderpasswebservice.iml" filepath="$PROJECT_DIR$/.idea/modules/borderpasswebservice.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/borderpasswebservice_main.iml" filepath="$PROJECT_DIR$/.idea/modules/borderpasswebservice_main.iml" group="borderpasswebservice" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/borderpasswebservice_test.iml" filepath="$PROJECT_DIR$/.idea/modules/borderpasswebservice_test.iml" group="borderpasswebservice" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/prediction-boot.iml" filepath="$PROJECT_DIR$/.idea/modules/prediction-boot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/prediction-boot_main.iml" filepath="$PROJECT_DIR$/.idea/modules/prediction-boot_main.iml" group="prediction-boot" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/prediction-boot_test.iml" filepath="$PROJECT_DIR$/.idea/modules/prediction-boot_test.iml" group="prediction-boot" />
     </modules>
   </component>
 </project>

@@ -98,3 +98,4 @@ gradle-app.setting
 
 server-config/**
 **/db.properties
+**/application.properties
