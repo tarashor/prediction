@@ -2,6 +2,9 @@ package com.tarashor.web;
 
 import com.tarashor.data.IStatisticsRepository;
 import com.tarashor.models.StatisticItem;
+import org.la4j.Matrices;
+import org.la4j.Matrix;
+import org.la4j.matrix.DenseMatrix;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -58,5 +61,11 @@ public class APIController {
     @RequestMapping(value = "/passes", produces="application/json;charset=UTF-8", method = GET)
     public @ResponseBody List<String> passes(){
         return dataRepository.getPasses();
+    }
+
+    @RequestMapping(value = "/pred", produces="application/json;charset=UTF-8", method = GET)
+    public @ResponseBody String prediction(){
+        Matrix matrix = Matrix.constant(100,100,1);
+        return matrix.toString();
     }
 }

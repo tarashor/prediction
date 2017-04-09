@@ -27,6 +27,8 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-jdbc')
 	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
     compile ('mysql:mysql-connector-java')
-    //compile('org.apache.tomcat.embed:tomcat-embed-jasper')
+	// https://mvnrepository.com/artifact/org.la4j/la4j
+	compile group: 'org.la4j', name: 'la4j', version: '0.6.0'
+	//compile('org.apache.tomcat.embed:tomcat-embed-jasper')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
