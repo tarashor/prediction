@@ -63,7 +63,7 @@ public class APIController {
 
     @RequestMapping(value = "/pred", produces="application/json;charset=UTF-8", method = GET)
     public @ResponseBody String prediction(){
-        Map<Date, Integer> inputData = getDateToValueMap();
+        TreeMap<Date, Integer> inputData = getDateToValueMap();
         Matrix X = createXMatrix(inputData);
         Vector y = createYVector(inputData);
         // beta = (Xt * X)^-1 * Xt * y
@@ -72,36 +72,66 @@ public class APIController {
         return beta.toString();
     }
 
-    private Vector createYVector(Map<Date, Integer> inputData) {
-        return null;
+    private Vector createYVector(TreeMap<Date, Integer> inputData) {
+        int n = inputData.size();
+        return Vector.zero(n-3);
     }
 
     private Matrix createXMatrix(TreeMap<Date, Integer> inputData) {
         int n = inputData.size();
         Matrix X = Matrix.zero(n-3, 7);
-        for (Map.Entry<Date, ?> entry : inputData.entrySet()) {
+        for (Map.Entry<Date, Integer> entry : inputData.entrySet()) {
 
         }
         for (int i = 0; i < X.rows(); i++){
-            for (int j = 0; j < X.columns(); j++){
-                X.set(i, j, );
-            }
+            X.set(i, 0, 1);
+            X.set(i, 0, inputData.get());
         }
         return X;
     }
 
     private TreeMap<Date, Integer> getDateToValueMap() {
-        TreeMap<Date, Integer> map = new TreeMap<>();
         Calendar calendar = Calendar.getInstance();
         Date endDate = calendar.getTime();
-        calendar.set(2017,Calendar.FEBRUARY,2);
+        calendar.set(2017, Calendar.FEBRUARY,2);
         Date startDate = calendar.getTime();
-        String passName = "";
+        String passName = "Грушів - Будомеж";
         List<StatisticItem> statisticItems = dataRepository.getStatisticsForPass(passName, startDate, endDate);
 
+        TreeMap<Date, Integer> map = new TreeMap<>();
         for (StatisticItem statisticItem : statisticItems) {
             map.put(statisticItem.getDate(), statisticItem.getCarsCountBeforeBorder() + statisticItem.getCarsCountOnBorder());
         }
+
+//        int[] hoursPerDay = new int[]{6,8,12,15,18,22};
+//        List<Date> dates = getDaysBetweenDates(startDate, endDate);
+//        for ()
+
+//        for (Map.Entry<Date, Integer> entry : map.entrySet()) {
+//            System.out.println(entry.getKey());
+//        }
+//        2017-04-10 06:00:00.0
+//        2017-04-10 08:00:00.0
+//        2017-04-10 12:00:00.0
+//        2017-04-10 15:00:00.0
+//        2017-04-10 18:00:00.0
+//        2017-04-10 22:00:00.0
+
         return map;
+    }
+
+    public static List<Date> getDaysBetweenDates(Date startdate, Date enddate)
+    {
+        List<Date> dates = new ArrayList<>();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(startdate);
+
+        while (calendar.getTime().before(enddate))
+        {
+            Date result = calendar.getTime();
+            dates.add(result);
+            calendar.add(Calendar.DATE, 1);
+        }
+        return dates;
     }
 }
