@@ -1,4 +1,4 @@
-package com.tarashor.models;
+package com.tarashor.data.models;
 
 import java.util.Date;
 
