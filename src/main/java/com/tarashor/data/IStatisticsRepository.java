@@ -11,6 +11,7 @@ import java.util.List;
 public interface IStatisticsRepository {
     List<StatisticItem> getStatisticsForPass(String passName, Date startDate, Date endDate, int max);
     List<StatisticItem> getStatisticsForPass(String pass, Date startDate, Date endDate);
+    List<StatisticItem> getStatisticsForPass(String pass);
 
     List<String> getPasses();
 
