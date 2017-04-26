@@ -23,6 +23,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RequestMapping(value="/api")
 public class APIController {
 
+    public static final int MILLISECONDS_IN_HOUR = 3600000;
     private IStatisticsRepository dataRepository;
 
     @Autowired
@@ -127,9 +128,11 @@ public class APIController {
                     int ceilingValue = ceilingEntry.getValue();
                     int hoursBetweenFloorCeilingDates = getHoursBetweenDates(floorEntry.getKey(), ceilingEntry.getKey());
                     int hoursBetweenFloorCurrentDates = getHoursBetweenDates(floorEntry.getKey(), currentDate);
-                    double c = ((double)hoursBetweenFloorCurrentDates/hoursBetweenFloorCeilingDates);
-                    int currentValue = (int)(floorValue + (ceilingValue - floorValue) * c);
-                    fullMap.put(currentDate, currentValue);
+                    if (hoursBetweenFloorCeilingDates > 0) {
+                        double c = ((double) hoursBetweenFloorCurrentDates / hoursBetweenFloorCeilingDates);
+                        int currentValue = (int) (floorValue + (ceilingValue - floorValue) * c);
+                        fullMap.put(currentDate, currentValue);
+                    }
                 }
             }
         }
@@ -155,8 +158,13 @@ public class APIController {
         return fullMap;
     }
 
-    private int getHoursBetweenDates(Date key, Date key1) {
-        return 0;
+    private int getHoursBetweenDates(Date firstDate, Date secondDate) {
+        int hours = 0;
+        if (firstDate != null && secondDate != null){
+            long millisecondsBetweenDates = Math.abs(firstDate.getTime() - secondDate.getTime());
+            hours = (int) (millisecondsBetweenDates / MILLISECONDS_IN_HOUR);
+        }
+        return hours;
     }
 
     public static List<Date> getDaysBetweenDates(Date startdate, Date enddate)
