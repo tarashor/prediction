@@ -1,6 +1,6 @@
-package com.tarashor.data;
+package com.tarashor.db;
 
-import com.tarashor.data.models.StatisticItem;
+import com.tarashor.db.models.StatisticItem;
 
 import java.util.Date;
 import java.util.List;

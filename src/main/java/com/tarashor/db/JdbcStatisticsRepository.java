@@ -1,6 +1,6 @@
-package com.tarashor.data;
+package com.tarashor.db;
 
-import com.tarashor.data.models.StatisticItem;
+import com.tarashor.db.models.StatisticItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowMapper;
