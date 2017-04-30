@@ -51,7 +51,7 @@ var config = {
                 ticks: {
                     beginAtZero: true, // minimum value will be 0.
                     suggestedMin: 0,
-                    suggestedMax: 200
+                    suggestedMax: 600
                 }
             }]
         }
@@ -62,7 +62,16 @@ function setDataForChart(l, beforeBorder, summary) {
    config.data.labels = l;
    config.data.datasets[0].data = summary;
    config.data.datasets[1].data = beforeBorder;
-    statisticChart.update();
+   statisticChart.update();
+}
+
+
+function setLabelsForChart(title, xAxis, yAxis, summaryLabel, beforeBorderLabel) {
+    config.options.title.text = title;
+    config.options.scales.xAxes[0].scaleLabel.labelString = xAxis;
+    config.options.scales.yAxes[0].scaleLabel.labelString = yAxis;
+    config.data.datasets[0].label = summaryLabel;
+    config.data.datasets[1].label = beforeBorderLabel;
 }
 
 function fillinPasses(options) {
@@ -108,6 +117,15 @@ function loadPassStatisticWithValues(){
 }
 
 $(document).ready(function () {
+    var chartJQ = $("#statisticChart");
+
+    var chartTitle = chartJQ.data("title");
+    var xAxis = chartJQ.data("x_axis");
+    var yAxis = chartJQ.data("y_axis");
+    var chartSummary = chartJQ.data("dataset_summary_label");
+    var chartBeforeBorder = chartJQ.data("dataset_before_border_label");
+    setLabelsForChart(chartTitle, xAxis, yAxis, chartSummary, chartBeforeBorder);
+
     $('#datetimepickerStart').datetimepicker({
         format: "DD.MM.YYYY"
     });
@@ -134,7 +152,7 @@ $(document).ready(function () {
     $("#passes").change(function () {
         loadPassStatisticWithValues();
     });
-    var ctx2 = $("#statisticChart").get(0).getContext("2d");
+    var ctx2 = chartJQ.get(0).getContext("2d");
     statisticChart = new Chart(ctx2, config);
     loadPassesList();
 });

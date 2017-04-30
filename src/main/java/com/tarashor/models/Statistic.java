@@ -1,6 +1,7 @@
 package com.tarashor.models;
 
 import com.tarashor.db.models.StatisticItem;
+import com.tarashor.utils.DateTimeUtility;
 
 import java.util.*;
 
@@ -91,29 +92,66 @@ public class Statistic {
     }
 
     public List<Date> getDatesToCount() {
-        return null;
+        List<Date> datesToCount = new ArrayList<>();
+        List<Date> datesBetween2Dates = DateTimeUtility.getDaysBetweenDates(fullStatisticMap.firstKey(), fullStatisticMap.lastKey());
+        for(Date date : datesBetween2Dates){
+
+        }
+        return datesToCount;
     }
 
     public static List<Date> getHolidaysUkraine(){
         List<Date> holidays = new ArrayList<>();
 
+        Calendar calendar = Calendar.getInstance();
         //"1.1.2017"
-        //"7.1.2017"
-        //"8.3.2017"
-        //"16.04.2017"
-        //"1.5.2017"
-        //"2.5.2017"
-        //"9.5.2017"
-        //"4.6.2017"
-        //"28.6.2017"
-        //"24.8.2017"
-        //"14.10.2017"
-
+        calendar.set(2017, Calendar.JANUARY, 1);
+        holidays.add(calendar.getTime());
         //"2.1.2017"
+        calendar.set(2017, Calendar.JANUARY, 2);
+        holidays.add(calendar.getTime());
+        //"7.1.2017"
+        calendar.set(2017, Calendar.JANUARY, 7);
+        holidays.add(calendar.getTime());
         //"9.1.2017"
-        //"17.4.2017"
+        calendar.set(2017, Calendar.JANUARY, 9);
+        holidays.add(calendar.getTime());
+        //"8.3.2017"
+        calendar.set(2017, Calendar.MARCH, 8);
+        holidays.add(calendar.getTime());
+        //"16.04.2017"
+        calendar.set(2017, Calendar.APRIL, 16);
+        holidays.add(calendar.getTime());
+        //"17.04.2017"
+        calendar.set(2017, Calendar.APRIL, 17);
+        holidays.add(calendar.getTime());
+        //"1.05.2017"
+        calendar.set(2017, Calendar.MAY, 1);
+        holidays.add(calendar.getTime());
+        //"2.05.2017"
+        calendar.set(2017, Calendar.MAY, 2);
+        holidays.add(calendar.getTime());
+        //"9.05.2017"
+        calendar.set(2017, Calendar.MAY, 9);
+        holidays.add(calendar.getTime());
+        //"4.06.2017"
+        calendar.set(2017, Calendar.JUNE, 4);
         //"5.06.2017"
+        calendar.set(2017, Calendar.JUNE, 5);
+        holidays.add(calendar.getTime());
+        //"28.06.2017"
+        calendar.set(2017, Calendar.JUNE, 28);
+        holidays.add(calendar.getTime());
+        //"24.8.2017"
+        calendar.set(2017, Calendar.AUGUST, 24);
+        holidays.add(calendar.getTime());
+        //"14.10.2017"
+        calendar.set(2017, Calendar.OCTOBER, 14);
+        holidays.add(calendar.getTime());
         //"16.10.2017"
+        calendar.set(2017, Calendar.OCTOBER, 16);
+        holidays.add(calendar.getTime());
+
 
         return holidays;
     }
@@ -137,5 +175,13 @@ public class Statistic {
 
 
         return holidays;
+    }
+
+    public int getDaysToNextHolidayUkr(Date date) {
+        return 0;
+    }
+
+    public int getDaysToPrevHolidayUkr(Date date) {
+        return 0;
     }
 }

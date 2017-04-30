@@ -82,6 +82,7 @@ public class APIController {
         int i = 0;
         for (Date date : dates) {
             y.set(i, statistic.getValueForDate(date));
+            i++;
         }
         return y;
     }
@@ -89,7 +90,7 @@ public class APIController {
     private Matrix createXMatrix(Statistic statistic) {
         List<Date> dates = statistic.getDatesToCount();
         int n = dates.size();
-        Matrix X = Matrix.zero(n, 7);
+        Matrix X = Matrix.zero(n, 9);
         int i = 0;
         for (Date date : dates) {
             X.set(i, 0, 1);
@@ -97,6 +98,28 @@ public class APIController {
             calendar.setTime(date);
             calendar.set(Calendar.HOUR, -3);
             X.set(i, 1, statistic.getValueForDate(calendar.getTime()));
+            calendar.setTime(date);
+            calendar.set(Calendar.HOUR, -6);
+            X.set(i, 2, statistic.getValueForDate(calendar.getTime()));
+            calendar.setTime(date);
+            calendar.set(Calendar.HOUR, -9);
+            X.set(i, 3, statistic.getValueForDate(calendar.getTime()));
+            calendar.setTime(date);
+            calendar.set(Calendar.HOUR, -12);
+            X.set(i, 4, statistic.getValueForDate(calendar.getTime()));
+            calendar.setTime(date);
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            X.set(i, 5, hour);
+            calendar.setTime(date);
+            int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+            X.set(i, 6, dayOfWeek);
+
+            int daysToNextHolidayUkr = statistic.getDaysToNextHolidayUkr(date);
+            X.set(i, 7, daysToNextHolidayUkr);
+            int daysToPrevHolidayUkr = statistic.getDaysToPrevHolidayUkr(date);
+            X.set(i, 8, daysToPrevHolidayUkr);
+            i++;
+
         }
 
         return X;

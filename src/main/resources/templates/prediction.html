@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+    <head th:replace="layout :: head">
+    </head>
+    <body style="padding-top: 80px;">
+        <div th:replace="layout :: navigation('prediction')"></div>
+        <div class="container" style="width:950px; margin: auto;">
+            <div>
+                <h4 th:text="#{label.home.choose_param}">Choose parameters</h4>
+                <form class="form-inline">
+                    <div class="form-group">
+                        <label for="passes" th:text="#{label.home.pass} + ':'">Pass:</label>
+                        <select id="passes" class="form-control"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="datetimepickerStart" th:text="#{label.home.start} + ':'">Start date:</label>
+                        <div class='input-group date' id='datetimepickerStart'>
+                            <input type='text' class="form-control" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="datetimepickerEnd" th:text="#{label.home.end} + ':'">End date:</label>
+                        <div class='input-group date' id='datetimepickerEnd'>
+                            <input type='text' class="form-control" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <canvas id="statisticChart" width="400" height="400"
+                    th:attr="data-title=#{label.home.chart.title}, data-x_axis=#{label.home.chart.x_axis}, data-y_axis=#{label.home.chart.y_axis}, data-dataset_summary_label=#{label.home.chart.summary_label}, data-dataset_before_border_label=#{label.home.chart.before_border_label}" />
+        </div>
+        <div th:replace="layout :: scripts"></div>
+    </body>
+</html>
