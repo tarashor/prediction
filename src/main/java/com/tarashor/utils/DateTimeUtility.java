@@ -20,7 +20,16 @@ public class DateTimeUtility {
         return hours;
     }
 
-    public static List<Date> getDaysBetweenDates(Date startdate, Date enddate)
+    public static int getDaysBetweenDates(Date firstDate, Date secondDate) {
+        int hours = 0;
+        if (firstDate != null && secondDate != null){
+            long millisecondsBetweenDates = Math.abs(firstDate.getTime() - secondDate.getTime());
+            hours = (int) (millisecondsBetweenDates / (MILLISECONDS_IN_HOUR * 24));
+        }
+        return hours;
+    }
+
+    public static List<Date> getDatesBetweenDates(Date startdate, Date enddate)
     {
         List<Date> dates = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
@@ -38,6 +47,16 @@ public class DateTimeUtility {
     public static Date roundDateToHours(Date date){
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
+    }
+
+    public static Date setHour(Date date, int hour){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.HOUR, hour);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);

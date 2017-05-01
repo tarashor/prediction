@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.*;
 
 import static com.tarashor.utils.DateTimeUtility.getDaysBetweenDates;
-import static com.tarashor.utils.DateTimeUtility.getHoursBetweenDates;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 /**
@@ -127,7 +126,13 @@ public class APIController {
 
     private Statistic getDateToValueMap() {
         String passName = "Грушів - Будомеж";
-        List<StatisticItem> statisticItems = dataRepository.getStatisticsForPass(passName);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2017, 3, 1);
+        Date startDate = calendar.getTime();
+
+        calendar.set(2017, 3, 30);
+        Date endDate = calendar.getTime();
+        List<StatisticItem> statisticItems = dataRepository.getStatisticsForPass(passName, startDate, endDate);
         return new Statistic(statisticItems);
     }
 

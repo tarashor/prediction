@@ -5,9 +5,7 @@ import com.tarashor.utils.DateTimeUtility;
 
 import java.util.*;
 
-import static com.tarashor.utils.DateTimeUtility.getDaysBetweenDates;
-import static com.tarashor.utils.DateTimeUtility.getHoursBetweenDates;
-import static com.tarashor.utils.DateTimeUtility.roundDateToHours;
+import static com.tarashor.utils.DateTimeUtility.*;
 
 /**
  * Created by Taras on 29.04.2017.
@@ -33,7 +31,7 @@ public class Statistic {
         Date endDate = map.lastEntry().getKey();
 
         int[] hoursPerDay = getHoursOfStatistic();
-        List<Date> dates = getDaysBetweenDates(startDate, endDate);
+        List<Date> dates = getDatesBetweenDates(startDate, endDate);
 
         Calendar calendar = Calendar.getInstance();
         for (Date date : dates){
@@ -93,9 +91,12 @@ public class Statistic {
 
     public List<Date> getDatesToCount() {
         List<Date> datesToCount = new ArrayList<>();
-        List<Date> datesBetween2Dates = DateTimeUtility.getDaysBetweenDates(fullStatisticMap.firstKey(), fullStatisticMap.lastKey());
+        List<Date> datesBetween2Dates = getDatesBetweenDates(fullStatisticMap.firstKey(), fullStatisticMap.lastKey());
         for(Date date : datesBetween2Dates){
-
+            for (int i = 0; i < 24; i+=3){
+                Date hDate = DateTimeUtility.setHour(date, i);
+                datesToCount.add(hDate);
+            }
         }
         return datesToCount;
     }
@@ -178,10 +179,14 @@ public class Statistic {
     }
 
     public int getDaysToNextHolidayUkr(Date date) {
-        return 0;
+        TreeSet<Date> treeSet = new TreeSet<>(getHolidaysUkraine());
+        Date nextHoliday = treeSet.ceiling(date);
+        return DateTimeUtility.getDaysBetweenDates(date, nextHoliday);
     }
 
     public int getDaysToPrevHolidayUkr(Date date) {
-        return 0;
+        TreeSet<Date> treeSet = new TreeSet<>(getHolidaysUkraine());
+        Date prevHoliday = treeSet.floor(date);
+        return DateTimeUtility.getDaysBetweenDates(date, prevHoliday);
     }
 }
