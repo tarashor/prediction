@@ -1,6 +1,6 @@
 package com.tarashor.db;
 
-import com.tarashor.db.models.StatisticItem;
+import com.tarashor.db.models.StatisticItemDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowMapper;
@@ -35,17 +35,17 @@ public class JdbcStatisticsRepository implements IStatisticsRepository {
     }
 
     @Override
-    public List<StatisticItem> getStatisticsForPass(String passName, Date startDate, Date endDate, int max) {
+    public List<StatisticItemDAO> getStatisticsForPass(String passName, Date startDate, Date endDate, int max) {
         return jdbcOperations.query(SELECT_STAT_ITEMS_DATE_MAX_QUERY, new StatisticItemRowMapper(), passName, startDate, endDate, max);
     }
 
     @Override
-    public List<StatisticItem> getStatisticsForPass(String passName, Date startDate, Date endDate) {
+    public List<StatisticItemDAO> getStatisticsForPass(String passName, Date startDate, Date endDate) {
         return jdbcOperations.query(SELECT_STAT_ITEMS_DATE_QUERY, new StatisticItemRowMapper(), passName, startDate, endDate);
     }
 
     @Override
-    public List<StatisticItem> getStatisticsForPass(String passName) {
+    public List<StatisticItemDAO> getStatisticsForPass(String passName) {
         return jdbcOperations.query(SELECT_STAT_ITEMS_QUERY, new StatisticItemRowMapper(), passName);
     }
 
@@ -54,10 +54,10 @@ public class JdbcStatisticsRepository implements IStatisticsRepository {
         return jdbcOperations.queryForList(SELECT_DISTINCT_PASSES, String.class);
     }
 
-    private static class StatisticItemRowMapper implements RowMapper<StatisticItem> {
+    private static class StatisticItemRowMapper implements RowMapper<StatisticItemDAO> {
         @Override
-        public StatisticItem mapRow(ResultSet rs, int rowNum) throws SQLException {
-            return new StatisticItem(
+        public StatisticItemDAO mapRow(ResultSet rs, int rowNum) throws SQLException {
+            return new StatisticItemDAO(
                     rs.getString(PASS_COLUMN_NAME),
                     rs.getInt(CARS_BEFORE_BORDER_COLUMN_NAME),
                     rs.getInt(CARS_ON_BORDER_COLUMN_NAME),

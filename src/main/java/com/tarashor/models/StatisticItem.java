@@ -1,5 +1,6 @@
-package com.tarashor.db.models;
+package com.tarashor.models;
 
+import java.util.Comparator;
 import java.util.Date;
 
 /**
@@ -33,5 +34,13 @@ public class StatisticItem {
 
     public Date getDate() {
         return date;
+    }
+
+    public static class DateComparator implements Comparator<StatisticItem>{
+
+        @Override
+        public int compare(StatisticItem o1, StatisticItem o2) {
+            return o2.getDate().compareTo(o1.getDate());
+        }
     }
 }

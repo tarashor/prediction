@@ -99,7 +99,7 @@ function loadPassStatistic(passName, startDateMilliseconds, endDateMilliseconds)
                 var dateStr = moment(res[i].date).format("D.MM.YYYY HH:mm");
                 l.push(dateStr);
                 bb.push(res[i].carsCountBeforeBorder);
-                s.push(res[i].carsCountBeforeBorder + res[i].carsCountOnBorder);
+                s.push(res[i].carsCountOnBorder);
             }
             setDataForChart(l, bb, s);
         });

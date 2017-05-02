@@ -1,6 +1,6 @@
 package com.tarashor.models;
 
-import com.tarashor.db.models.StatisticItem;
+import com.tarashor.db.models.StatisticItemDAO;
 import com.tarashor.utils.DateTimeUtility;
 
 import java.util.*;
@@ -15,15 +15,15 @@ public class Statistic {
 
     private TreeMap<Date, Integer> fullStatisticMap = new TreeMap<>();
 
-    public Statistic(List<StatisticItem> statisticItems) {
+    public Statistic(List<StatisticItemDAO> statisticItems) {
         init(statisticItems);
     }
 
-    private void init(List<StatisticItem> statisticItems) {
+    private void init(List<StatisticItemDAO> statisticItems) {
         fullStatisticMap = new TreeMap<>();
 
         TreeMap<Date, Integer> map = new TreeMap<>();
-        for (StatisticItem statisticItem : statisticItems) {
+        for (StatisticItemDAO statisticItem : statisticItems) {
             map.put(statisticItem.getDate(), statisticItem.getCarsCountBeforeBorder() + statisticItem.getCarsCountOnBorder());
         }
 
@@ -47,14 +47,16 @@ public class Statistic {
                 } else {
                     Map.Entry<Date, Integer> floorEntry = map.floorEntry(currentDate);
                     Map.Entry<Date, Integer> ceilingEntry = map.ceilingEntry(currentDate);
-                    int floorValue = floorEntry.getValue();
-                    int ceilingValue = ceilingEntry.getValue();
-                    int hoursBetweenFloorCeilingDates = getHoursBetweenDates(floorEntry.getKey(), ceilingEntry.getKey());
-                    int hoursBetweenFloorCurrentDates = getHoursBetweenDates(floorEntry.getKey(), currentDate);
-                    if (hoursBetweenFloorCeilingDates > 0) {
-                        double c = ((double) hoursBetweenFloorCurrentDates / hoursBetweenFloorCeilingDates);
-                        int currentValue = (int) (floorValue + (ceilingValue - floorValue) * c);
-                        fullStatisticMap.put(currentDate, currentValue);
+                    if (floorEntry != null && ceilingEntry != null) {
+                        int floorValue = floorEntry.getValue();
+                        int ceilingValue = ceilingEntry.getValue();
+                        int hoursBetweenFloorCeilingDates = getHoursBetweenDates(floorEntry.getKey(), ceilingEntry.getKey());
+                        int hoursBetweenFloorCurrentDates = getHoursBetweenDates(floorEntry.getKey(), currentDate);
+                        if (hoursBetweenFloorCeilingDates > 0) {
+                            double c = ((double) hoursBetweenFloorCurrentDates / hoursBetweenFloorCeilingDates);
+                            int currentValue = (int) (floorValue + (ceilingValue - floorValue) * c);
+                            fullStatisticMap.put(currentDate, currentValue);
+                        }
                     }
                 }
             }
@@ -68,21 +70,23 @@ public class Statistic {
     public int getValueForDate(Date date){
         Date dateTimeToHours = roundDateToHours(date);
 
-        int result = 0;
+        int result = -1;
         if (fullStatisticMap.containsKey(dateTimeToHours)) {
             result = fullStatisticMap.get(dateTimeToHours);
         } else {
             Map.Entry<Date, Integer> floorEntry = fullStatisticMap.floorEntry(dateTimeToHours);
             Map.Entry<Date, Integer> ceilingEntry = fullStatisticMap.ceilingEntry(dateTimeToHours);
-            int floorValue = floorEntry.getValue();
-            int ceilingValue = ceilingEntry.getValue();
-            int hoursBetweenFloorCeilingDates = getHoursBetweenDates(floorEntry.getKey(), ceilingEntry.getKey());
-            int hoursBetweenFloorCurrentDates = getHoursBetweenDates(floorEntry.getKey(), dateTimeToHours);
-            if (hoursBetweenFloorCeilingDates > 0) {
-                double c = ((double) hoursBetweenFloorCurrentDates / hoursBetweenFloorCeilingDates);
-                result = (int) (floorValue + (ceilingValue - floorValue) * c);
-            } else {
-                result = floorEntry.getValue();
+            if (floorEntry != null && ceilingEntry != null) {
+                int floorValue = floorEntry.getValue();
+                int ceilingValue = ceilingEntry.getValue();
+                int hoursBetweenFloorCeilingDates = getHoursBetweenDates(floorEntry.getKey(), ceilingEntry.getKey());
+                int hoursBetweenFloorCurrentDates = getHoursBetweenDates(floorEntry.getKey(), dateTimeToHours);
+                if (hoursBetweenFloorCeilingDates > 0) {
+                    double c = ((double) hoursBetweenFloorCurrentDates / hoursBetweenFloorCeilingDates);
+                    result = (int) (floorValue + (ceilingValue - floorValue) * c);
+                } else {
+                    result = floorEntry.getValue();
+                }
             }
         }
 
