@@ -35,13 +35,14 @@
     </div>
     <canvas id="statisticChart" width="400" height="400"
             th:attr="data-title=#{label.home.chart.title}, data-x_axis=#{label.home.chart.x_axis}, data-y_axis=#{label.home.chart.y_axis}, data-dataset_summary_label=#{label.home.chart.summary_label}, data-dataset_before_border_label=#{label.home.chart.before_border_label}" />
+
 </div>
 <script>
     statUrl = "/api/stat";
     passesUrl = "/api/passes";
 </script>
 <div th:replace="layout :: scripts"></div>
-<script th:src="@{/res/js/app.js}"></script>
+<script th:src="@{/res/js/home.js}"></script>
 </body>
 </html>
 

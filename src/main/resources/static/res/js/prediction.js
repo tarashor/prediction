@@ -4,14 +4,14 @@ var config = {
         labels: [],
         datasets: [
             {
-                label:"Summary",
+                label:"Statistic",
                 backgroundColor: "rgba(76, 74, 191, 0.2)",
                 borderColor: "rgba(76, 74, 191, 1)",
                 data: [],
                 fill: false
             },
             {
-                label:"Before border",
+                label:"Prediction",
                 backgroundColor: "rgba(75, 192, 192, 0.2)",
                 borderColor: "rgba(75, 192, 192, 1)",
                 data: [],
@@ -58,20 +58,20 @@ var config = {
     }
 };
 
-function setDataForChart(l, beforeBorder, summary) {
+function setDataForChart(l, statistic, prediction) {
    config.data.labels = l;
-   config.data.datasets[0].data = summary;
-   config.data.datasets[1].data = beforeBorder;
+   config.data.datasets[0].data = statistic;
+   config.data.datasets[1].data = prediction;
    statisticChart.update();
 }
 
 
-function setLabelsForChart(title, xAxis, yAxis, summaryLabel, beforeBorderLabel) {
+function setLabelsForChart(title, xAxis, yAxis, statisticLabel, predictionLabel) {
     config.options.title.text = title;
     config.options.scales.xAxes[0].scaleLabel.labelString = xAxis;
     config.options.scales.yAxes[0].scaleLabel.labelString = yAxis;
-    config.data.datasets[0].label = summaryLabel;
-    config.data.datasets[1].label = beforeBorderLabel;
+    config.data.datasets[0].label = statisticLabel;
+    config.data.datasets[1].label = predictionLabel;
 }
 
 function fillinPasses(options) {
@@ -93,15 +93,15 @@ function loadPassStatistic(passName, startDateMilliseconds, endDateMilliseconds)
         function (res) {
             res.reverse();
             var l = [];
-            var bb = [];
-            var s = [];
+            var stat = [];
+            var pred = [];
             for (var i = 0; i < res.length; i++) {
                 var dateStr = moment(res[i].date).format("D.MM.YYYY HH:mm");
                 l.push(dateStr);
-                bb.push(res[i].carsCountBeforeBorder);
-                s.push(res[i].carsCountOnBorder);
+                stat.push(res[i].statistic);
+                pred.push(res[i].prediction);
             }
-            setDataForChart(l, bb, s);
+            setDataForChart(l, stat, pred);
         });
 }
 
@@ -114,7 +114,28 @@ function loadPassesList() {
 
 function loadPassStatisticWithValues(){
     loadPassStatistic($("#passes").val(), $('#datetimepickerStart').data("DateTimePicker").date().valueOf(), $('#datetimepickerEnd').data("DateTimePicker").date().valueOf())
+    loadErrors($("#passes").val());
 }
+
+function loadErrors(passName){
+    $.get("/api/prederror",
+            {
+                pass: passName
+            },
+            function (res) {
+                $("#predictionError").html(res);
+            });
+
+    $.get("/api/prederrorbest",
+            {
+                pass: passName
+            },
+            function (res) {
+                $("#bestError").html(res);
+
+            });
+}
+
 
 $(document).ready(function () {
     var chartJQ = $("#statisticChart");
@@ -122,9 +143,9 @@ $(document).ready(function () {
     var chartTitle = chartJQ.data("title");
     var xAxis = chartJQ.data("x_axis");
     var yAxis = chartJQ.data("y_axis");
-    var chartSummary = chartJQ.data("dataset_summary_label");
-    var chartBeforeBorder = chartJQ.data("dataset_before_border_label");
-    setLabelsForChart(chartTitle, xAxis, yAxis, chartSummary, chartBeforeBorder);
+    var chartStat = chartJQ.data("dataset_statistic");
+    var chartPred = chartJQ.data("dataset_prediction");
+    setLabelsForChart(chartTitle, xAxis, yAxis, chartStat, chartPred);
 
     $('#datetimepickerStart').datetimepicker({
         format: "DD.MM.YYYY"

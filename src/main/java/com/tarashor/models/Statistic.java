@@ -13,69 +13,46 @@ import static com.tarashor.utils.DateTimeUtility.*;
 public class Statistic {
     private final static int[] hoursOfStatistic = new int[]{6,8,12,15,18,22};
 
-    private TreeMap<Date, Integer> fullStatisticMap = new TreeMap<>();
+    private TreeMap<Date, Integer> beforeBorderMap = new TreeMap<>();
+    private TreeMap<Date, Integer> onBorderMap = new TreeMap<>();
 
     public Statistic(List<StatisticItemDAO> statisticItems) {
         init(statisticItems);
     }
 
     private void init(List<StatisticItemDAO> statisticItems) {
-        fullStatisticMap = new TreeMap<>();
+        beforeBorderMap = new TreeMap<>();
+        onBorderMap = new TreeMap<>();
 
-        TreeMap<Date, Integer> map = new TreeMap<>();
+
         for (StatisticItemDAO statisticItem : statisticItems) {
-            map.put(statisticItem.getDate(), statisticItem.getCarsCountBeforeBorder() + statisticItem.getCarsCountOnBorder());
+            beforeBorderMap.put(statisticItem.getDate(), statisticItem.getCarsCountBeforeBorder());
+            onBorderMap.put(statisticItem.getDate(), statisticItem.getCarsCountOnBorder());
         }
 
-        Date startDate = map.firstEntry().getKey();
-        Date endDate = map.lastEntry().getKey();
-
-        int[] hoursPerDay = getHoursOfStatistic();
-        List<Date> dates = getDatesBetweenDates(startDate, endDate);
-
-        Calendar calendar = Calendar.getInstance();
-        for (Date date : dates){
-            calendar.setTime(date);
-            for (int hour : hoursPerDay) {
-                calendar.set(Calendar.HOUR, hour);
-                calendar.set(Calendar.MINUTE, 0);
-                calendar.set(Calendar.SECOND, 0);
-                calendar.set(Calendar.MILLISECOND, 0);
-                Date currentDate = calendar.getTime();
-                if (map.containsKey(currentDate)) {
-                    fullStatisticMap.put(currentDate, map.get(currentDate));
-                } else {
-                    Map.Entry<Date, Integer> floorEntry = map.floorEntry(currentDate);
-                    Map.Entry<Date, Integer> ceilingEntry = map.ceilingEntry(currentDate);
-                    if (floorEntry != null && ceilingEntry != null) {
-                        int floorValue = floorEntry.getValue();
-                        int ceilingValue = ceilingEntry.getValue();
-                        int hoursBetweenFloorCeilingDates = getHoursBetweenDates(floorEntry.getKey(), ceilingEntry.getKey());
-                        int hoursBetweenFloorCurrentDates = getHoursBetweenDates(floorEntry.getKey(), currentDate);
-                        if (hoursBetweenFloorCeilingDates > 0) {
-                            double c = ((double) hoursBetweenFloorCurrentDates / hoursBetweenFloorCeilingDates);
-                            int currentValue = (int) (floorValue + (ceilingValue - floorValue) * c);
-                            fullStatisticMap.put(currentDate, currentValue);
-                        }
-                    }
-                }
-            }
-        }
     }
 
     private int[] getHoursOfStatistic() {
         return hoursOfStatistic;
     }
 
-    public int getValueForDate(Date date){
+    public int getBeforeBorderValueForDate(Date date){
+        return getValueFromMapByDate(beforeBorderMap, date);
+    }
+
+    public int getOnBorderValueForDate(Date date){
+        return getValueFromMapByDate(onBorderMap, date);
+    }
+
+    private int getValueFromMapByDate(TreeMap<Date, Integer> map, Date date) {
         Date dateTimeToHours = roundDateToHours(date);
 
         int result = -1;
-        if (fullStatisticMap.containsKey(dateTimeToHours)) {
-            result = fullStatisticMap.get(dateTimeToHours);
+        if (map.containsKey(dateTimeToHours)) {
+            result = map.get(dateTimeToHours);
         } else {
-            Map.Entry<Date, Integer> floorEntry = fullStatisticMap.floorEntry(dateTimeToHours);
-            Map.Entry<Date, Integer> ceilingEntry = fullStatisticMap.ceilingEntry(dateTimeToHours);
+            Map.Entry<Date, Integer> floorEntry = map.floorEntry(dateTimeToHours);
+            Map.Entry<Date, Integer> ceilingEntry = map.ceilingEntry(dateTimeToHours);
             if (floorEntry != null && ceilingEntry != null) {
                 int floorValue = floorEntry.getValue();
                 int ceilingValue = ceilingEntry.getValue();
@@ -87,6 +64,12 @@ public class Statistic {
                 } else {
                     result = floorEntry.getValue();
                 }
+            } else {
+                if (floorEntry == null && ceilingEntry != null) {
+                    result = ceilingEntry.getValue();
+                } else if (floorEntry != null && ceilingEntry == null) {
+                    result = floorEntry.getValue();
+                }
             }
         }
 
@@ -95,11 +78,15 @@ public class Statistic {
 
     public List<Date> getDatesToCount() {
         List<Date> datesToCount = new ArrayList<>();
-        List<Date> datesBetween2Dates = getDatesBetweenDates(fullStatisticMap.firstKey(), fullStatisticMap.lastKey());
+        Date startDate = beforeBorderMap.firstKey();
+        Date endDate = beforeBorderMap.lastKey();
+        List<Date> datesBetween2Dates = getDatesBetweenDates(startDate, endDate);
         for(Date date : datesBetween2Dates){
             for (int i = 0; i < 24; i+=3){
                 Date hDate = DateTimeUtility.setHour(date, i);
-                datesToCount.add(hDate);
+                if (hDate.after(startDate) && hDate.before(endDate)){
+                    datesToCount.add(hDate);
+                }
             }
         }
         return datesToCount;
@@ -141,6 +128,7 @@ public class Statistic {
         holidays.add(calendar.getTime());
         //"4.06.2017"
         calendar.set(2017, Calendar.JUNE, 4);
+        holidays.add(calendar.getTime());
         //"5.06.2017"
         calendar.set(2017, Calendar.JUNE, 5);
         holidays.add(calendar.getTime());

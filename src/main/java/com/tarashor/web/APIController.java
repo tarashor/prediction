@@ -2,6 +2,7 @@ package com.tarashor.web;
 
 import com.tarashor.db.IStatisticsRepository;
 import com.tarashor.db.models.StatisticItemDAO;
+import com.tarashor.models.PredictionItem;
 import com.tarashor.models.Statistic;
 import com.tarashor.models.StatisticItem;
 import org.la4j.*;
@@ -58,7 +59,47 @@ public class APIController {
         } else {
             daos = dataRepository.getStatisticsForPass(pass, startDate, endDate);
         }
+
         List<StatisticItem> statisticItems = new ArrayList<>();
+        if (daos != null){
+            Statistic statistic = new Statistic(daos);
+            List<Date> dates = statistic.getDatesToCount();
+            for (Date date : dates){
+                statisticItems.add(new StatisticItem(pass, statistic.getBeforeBorderValueForDate(date), statistic.getOnBorderValueForDate(date), date));
+            }
+        }
+
+        Collections.sort(statisticItems, new StatisticItem.DateComparator());
+        return statisticItems;
+    }
+
+    @RequestMapping(value = "/pred", produces="application/json;charset=UTF-8", method = GET)
+    public @ResponseBody List<PredictionItem> prediction(@RequestParam(value="pass", defaultValue = "")String pass,
+                                                        @RequestParam(value="start", defaultValue = "-1")long startDateMilliseconds,
+                                                        @RequestParam(value="end", defaultValue = "-1")long endDateMilliseconds,
+                                                        @RequestParam(value="max", defaultValue = "-1")int max){
+        Calendar calendar = Calendar.getInstance();
+
+        if (endDateMilliseconds > 0){
+            calendar.setTimeInMillis(endDateMilliseconds);
+        }
+        Date endDate = calendar.getTime();
+
+        if (startDateMilliseconds > 0){
+            calendar.setTimeInMillis(startDateMilliseconds);
+        } else {
+            calendar.setTime(endDate);
+            calendar.add(Calendar.DATE, -14);
+        }
+        Date startDate = calendar.getTime();
+
+        List<StatisticItemDAO> daos = null;
+        if (max > 0){
+            daos = dataRepository.getStatisticsForPass(pass, startDate, endDate, max);
+        } else {
+            daos = dataRepository.getStatisticsForPass(pass, startDate, endDate);
+        }
+        List<PredictionItem> statisticItems = new ArrayList<>();
         if (daos != null){
             Vector beta = getCostsForFeatures(pass);
 
@@ -67,25 +108,44 @@ public class APIController {
             for (Date date : dates){
                 Vector features = getFeaturesFromDate(date, statistic);
                 Vector y_pred = features.toRowMatrix().multiply(beta);
-                statisticItems.add(new StatisticItem(pass, statistic.getValueForDate(date), (int)y_pred.get(0), date));
+                statisticItems.add(new PredictionItem(pass, statistic.getBeforeBorderValueForDate(date), (int)y_pred.get(0), date));
             }
         }
 
-        Collections.sort(statisticItems, new StatisticItem.DateComparator());
+        Collections.sort(statisticItems, new PredictionItem.DateComparator());
         return statisticItems;
     }
+
+
 
     @RequestMapping(value = "/passes", produces="application/json;charset=UTF-8", method = GET)
     public @ResponseBody List<String> passes(){
         return dataRepository.getPasses();
     }
 
-    @RequestMapping(value = "/pred", produces="application/json;charset=UTF-8", method = GET)
-    public @ResponseBody String prediction(){
-        String passName = "Краковець - Корчова";
-        Vector beta = getCostsForFeatures(passName);
-        Vector errors = getErrors(beta, passName);
-        return String.valueOf(errors.max());
+    @RequestMapping(value = "/prederror", produces="application/json;charset=UTF-8", method = GET)
+    public @ResponseBody String predictionError(@RequestParam(value="pass", defaultValue = "Краковець - Корчова")String pass){
+        Vector beta = getCostsForFeatures(pass);
+        Vector errors = getErrors(beta, pass);
+        return String.valueOf(errors.norm());
+    }
+
+    @RequestMapping(value = "/prederrorbest", produces="application/json;charset=UTF-8", method = GET)
+    public @ResponseBody String predictionErrorBest(@RequestParam(value="pass", defaultValue = "Краковець - Корчова")String pass){
+        Statistic inputData = getTestSet(pass);
+        List<Date> dates = inputData.getDatesToCount();
+        Vector errors = Vector.zero(dates.size());
+        int i = 0;
+        for(Date date : dates){
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.add(Calendar.HOUR, -3);
+            double error = inputData.getBeforeBorderValueForDate(date) - inputData.getBeforeBorderValueForDate(calendar.getTime());
+            errors.set(i, error);
+            i++;
+        }
+
+        return String.valueOf(errors.norm());
     }
 
     private Vector getErrors(Vector beta, String passName) {
@@ -96,7 +156,7 @@ public class APIController {
         for(Date date : dates){
             Vector features = getFeaturesFromDate(date, inputData);
             Vector y_pred = features.toRowMatrix().multiply(beta);
-            double error = inputData.getValueForDate(date) - y_pred.get(0);
+            double error = inputData.getBeforeBorderValueForDate(date) - y_pred.get(0);
             errors.set(i, error);
             i++;
         }
@@ -123,7 +183,7 @@ public class APIController {
         Vector y = Vector.zero(n);
         int i = 0;
         for (Date date : dates) {
-            y.set(i, statistic.getValueForDate(date));
+            y.set(i, statistic.getBeforeBorderValueForDate(date));
             i++;
         }
         return y;
@@ -151,17 +211,17 @@ public class APIController {
         features.set(0, 1);
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
-        calendar.set(Calendar.HOUR, -3);
-        features.set(1, statistic.getValueForDate(calendar.getTime()));
+        calendar.add(Calendar.HOUR, -3);
+        features.set(1, statistic.getBeforeBorderValueForDate(calendar.getTime()));
         calendar.setTime(date);
-        calendar.set(Calendar.HOUR, -6);
-        features.set(2, statistic.getValueForDate(calendar.getTime()));
+        calendar.add(Calendar.HOUR, -6);
+        features.set(2, statistic.getBeforeBorderValueForDate(calendar.getTime()));
         calendar.setTime(date);
-        calendar.set(Calendar.HOUR, -9);
-        features.set(3, statistic.getValueForDate(calendar.getTime()));
+        calendar.add(Calendar.HOUR, -9);
+        features.set(3, statistic.getBeforeBorderValueForDate(calendar.getTime()));
         calendar.setTime(date);
-        calendar.set(Calendar.HOUR, -12);
-        features.set(4, statistic.getValueForDate(calendar.getTime()));
+        calendar.add(Calendar.HOUR, -12);
+        features.set(4, statistic.getBeforeBorderValueForDate(calendar.getTime()));
         calendar.setTime(date);
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         features.set(5, hour);
@@ -191,10 +251,10 @@ public class APIController {
     private Statistic getTestSet(String passName) {
         //String passName = "Краковець - Корчова";
         Calendar calendar = Calendar.getInstance();
-        calendar.set(2017, 3, 1);
+        calendar.set(2017, 4, 1);
         Date startDate = calendar.getTime();
 
-        calendar.set(2017, 3, 30);
+        calendar.set(2017, 4, 30);
         Date endDate = calendar.getTime();
         List<StatisticItemDAO> statisticItems = dataRepository.getStatisticsForPass(passName, startDate, endDate);
         return new Statistic(statisticItems);
