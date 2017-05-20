@@ -2,6 +2,7 @@ package com.tarashor.web;
 
 import com.tarashor.db.IStatisticsRepository;
 import com.tarashor.db.models.StatisticItemDAO;
+import com.tarashor.models.Prediction;
 import com.tarashor.models.PredictionItem;
 import com.tarashor.models.Statistic;
 import com.tarashor.models.StatisticItem;
@@ -101,14 +102,11 @@ public class APIController {
         }
         List<PredictionItem> statisticItems = new ArrayList<>();
         if (daos != null){
-            Vector beta = getCostsForFeatures(pass);
-
             Statistic statistic = new Statistic(daos);
+            Prediction prediction = new Prediction(getTrainSet(pass));
             List<Date> dates = statistic.getDatesToCount();
             for (Date date : dates){
-                Vector features = getFeaturesFromDate(date, statistic);
-                Vector y_pred = features.toRowMatrix().multiply(beta);
-                statisticItems.add(new PredictionItem(pass, statistic.getBeforeBorderValueForDate(date), (int)y_pred.get(0), date));
+                statisticItems.add(new PredictionItem(pass, statistic.getBeforeBorderValueForDate(date), prediction.getPredictionValueForDate(date), date));
             }
         }
 
@@ -125,8 +123,7 @@ public class APIController {
 
     @RequestMapping(value = "/prederror", produces="application/json;charset=UTF-8", method = GET)
     public @ResponseBody String predictionError(@RequestParam(value="pass", defaultValue = "Краковець - Корчова")String pass){
-        Vector beta = getCostsForFeatures(pass);
-        Vector errors = getErrors(beta, pass);
+        Vector errors = getErrors(pass);
         return String.valueOf(errors.norm());
     }
 
@@ -148,15 +145,14 @@ public class APIController {
         return String.valueOf(errors.norm());
     }
 
-    private Vector getErrors(Vector beta, String passName) {
+    private Vector getErrors(String passName) {
+        Prediction prediction = new Prediction(getTrainSet(passName));
         Statistic inputData = getTestSet(passName);
         List<Date> dates = inputData.getDatesToCount();
         Vector errors = Vector.zero(dates.size());
         int i = 0;
         for(Date date : dates){
-            Vector features = getFeaturesFromDate(date, inputData);
-            Vector y_pred = features.toRowMatrix().multiply(beta);
-            double error = inputData.getBeforeBorderValueForDate(date) - y_pred.get(0);
+            double error = inputData.getBeforeBorderValueForDate(date) - prediction.getPredictionValueForDate(date);
             errors.set(i, error);
             i++;
         }
@@ -166,75 +162,7 @@ public class APIController {
 
 
 
-    private Vector getCostsForFeatures(String passName) {
-        Statistic inputData = getTrainSet(passName);
-        Matrix X = createXMatrix(inputData);
-        Vector y = createYVector(inputData);
-        // beta = (Xt * X)^-1 * Xt * y
-        Matrix Xt = X.transpose();
-        Vector beta = Xt.multiply(X).withInverter(LinearAlgebra.InverterFactory.NO_PIVOT_GAUSS).inverse().multiply(Xt).multiply(y);
-        return beta;
 
-    }
-
-    private Vector createYVector(Statistic statistic) {
-        List<Date> dates = statistic.getDatesToCount();
-        int n = dates.size();
-        Vector y = Vector.zero(n);
-        int i = 0;
-        for (Date date : dates) {
-            y.set(i, statistic.getBeforeBorderValueForDate(date));
-            i++;
-        }
-        return y;
-    }
-
-    private Matrix createXMatrix(Statistic statistic) {
-        List<Date> dates = statistic.getDatesToCount();
-        int n = dates.size();
-        Matrix X = Matrix.zero(n, NUMBER_OF_FEATURES);
-        int i = 0;
-        for (Date date : dates) {
-            Vector x_row = getFeaturesFromDate(date, statistic);
-            for (int j = 0; j < x_row.length(); j++){
-                X.set(i, j, x_row.get(j));
-            }
-            i++;
-
-        }
-
-        return X;
-    }
-
-    private Vector getFeaturesFromDate(Date date, Statistic statistic) {
-        Vector features = Vector.zero(NUMBER_OF_FEATURES);
-        features.set(0, 1);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.add(Calendar.HOUR, -3);
-        features.set(1, statistic.getBeforeBorderValueForDate(calendar.getTime()));
-        calendar.setTime(date);
-        calendar.add(Calendar.HOUR, -6);
-        features.set(2, statistic.getBeforeBorderValueForDate(calendar.getTime()));
-        calendar.setTime(date);
-        calendar.add(Calendar.HOUR, -9);
-        features.set(3, statistic.getBeforeBorderValueForDate(calendar.getTime()));
-        calendar.setTime(date);
-        calendar.add(Calendar.HOUR, -12);
-        features.set(4, statistic.getBeforeBorderValueForDate(calendar.getTime()));
-        calendar.setTime(date);
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        features.set(5, hour);
-        calendar.setTime(date);
-        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-        features.set(6, dayOfWeek);
-
-        int daysToNextHolidayUkr = statistic.getDaysToNextHolidayUkr(date);
-        features.set(7, daysToNextHolidayUkr);
-        int daysToPrevHolidayUkr = statistic.getDaysToPrevHolidayUkr(date);
-        features.set(8, daysToPrevHolidayUkr);
-        return features;
-    }
 
     private Statistic getTrainSet(String passName) {
         //String passName = "Краковець - Корчова";

@@ -2,9 +2,11 @@ package com.tarashor.web;
 
 import org.springframework.boot.autoconfigure.web.WebMvcProperties;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.LocaleContextResolver;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 
@@ -37,7 +39,10 @@ public class HomeController {
         LocaleResolver localeResolver = new AcceptHeaderLocaleResolver();
         Locale resolvedLocale = localeResolver.resolveLocale(request);
         String language = request.getHeader(ACCEPT_LANGUAGE);
-        return ACCEPT_LANGUAGE + " = '" + language + "' locale = " + locale + " resolvedLocale = " + resolvedLocale;
+        return ACCEPT_LANGUAGE + " = '" + language
+                + "' locale = " + locale
+                + " resolvedLocale = " + resolvedLocale
+                + " LocaleContextHolder = " + LocaleContextHolder.getLocale();
     }
 
 }

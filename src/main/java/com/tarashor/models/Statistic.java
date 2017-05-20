@@ -170,13 +170,13 @@ public class Statistic {
         return holidays;
     }
 
-    public int getDaysToNextHolidayUkr(Date date) {
+    public static int getDaysToNextHolidayUkr(Date date) {
         TreeSet<Date> treeSet = new TreeSet<>(getHolidaysUkraine());
         Date nextHoliday = treeSet.ceiling(date);
         return DateTimeUtility.getDaysBetweenDates(date, nextHoliday);
     }
 
-    public int getDaysToPrevHolidayUkr(Date date) {
+    public static int getDaysToPrevHolidayUkr(Date date) {
         TreeSet<Date> treeSet = new TreeSet<>(getHolidaysUkraine());
         Date prevHoliday = treeSet.floor(date);
         return DateTimeUtility.getDaysBetweenDates(date, prevHoliday);
