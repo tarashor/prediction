@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org" lang="en">
+<head th:replace="layout :: head">
+</head>
+<body style="padding-top: 80px;">
+<div th:replace="layout :: navigation('prediction')"></div>
+<div class="container" style="width:950px; margin: auto;">
+    <div>
+        <h4 th:text="#{label.home.choose_param}">Choose parameters</h4>
+        <form class="form-inline">
+            <div class="form-group">
+                <label for="passes" th:text="#{label.home.pass} + ':'">Pass:</label>
+                <select id="passes" class="form-control"></select>
+            </div>
+            <div class="form-group">
+                <label for="datetimepickerStart" th:text="#{label.home.start} + ':'">Start date:</label>
+                <div class='input-group date' id='datetimepickerStart'>
+                    <input type='text' class="form-control" />
+                    <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="datetimepickerEnd" th:text="#{label.home.end} + ':'">End date:</label>
+                <div class='input-group date' id='datetimepickerEnd'>
+                    <input type='text' class="form-control" />
+                    <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                </div>
+            </div>
+
+        </form>
+    </div>
+    <canvas id="statisticChart" width="400" height="400"
+            th:attr="data-title=#{label.prediction.chart.title}, data-x_axis=#{label.prediction.chart.x_axis}, data-y_axis=#{label.prediction.chart.y_axis}, data-dataset_statistic=#{label.prediction.chart.statistic_label}, data-dataset_prediction=#{label.prediction.chart.prediction_label}" />
+    <div>
+        <p>
+            Best error: <span id="bestError"></span>
+        </p>
+        <p>
+            Prediction error: <span id="predictionError"></span>
+        </p>
+    </div>
+</div>
+<script>
+    statUrl = "/api/pred";
+    passesUrl = "/api/passes";
+</script>
+<div th:replace="layout :: scripts"></div>
+<script th:src="@{/res/js/prediction.js}"></script>
+</body>
+</html>

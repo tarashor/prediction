@@ -2,11 +2,8 @@ package com.tarashor.web;
 
 import com.tarashor.db.IStatisticsRepository;
 import com.tarashor.db.models.StatisticItemDAO;
-import com.tarashor.models.Prediction;
-import com.tarashor.models.PredictionItem;
-import com.tarashor.models.Statistic;
-import com.tarashor.models.StatisticItem;
-import org.la4j.*;
+import com.tarashor.models.*;
+import com.tarashor.models.features.Features;
 import org.la4j.Vector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,14 +21,13 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RestController
 @RequestMapping(value="/api")
 public class APIController {
-
-
-    private static final int NUMBER_OF_FEATURES = 9;
     private IStatisticsRepository dataRepository;
+    private Features features;
 
     @Autowired
-    public APIController(IStatisticsRepository dataRepository) {
+    public APIController(IStatisticsRepository dataRepository, Features features) {
         this.dataRepository = dataRepository;
+        this.features = features;
     }
 
     @RequestMapping(value = "/stat", produces="application/json;charset=UTF-8", method = GET)
@@ -103,10 +99,10 @@ public class APIController {
         List<PredictionItem> statisticItems = new ArrayList<>();
         if (daos != null){
             Statistic statistic = new Statistic(daos);
-            Prediction prediction = new Prediction(getTrainSet(pass));
+            Prediction prediction = new Prediction(getTrainSet(pass), features);
             List<Date> dates = statistic.getDatesToCount();
             for (Date date : dates){
-                statisticItems.add(new PredictionItem(pass, statistic.getBeforeBorderValueForDate(date), prediction.getPredictionValueForDate(date), date));
+                statisticItems.add(new PredictionItem(pass, statistic.getBeforeBorderValueForDate(date), prediction.getPredictionValueForDate(date, statistic), date));
             }
         }
 
@@ -146,21 +142,19 @@ public class APIController {
     }
 
     private Vector getErrors(String passName) {
-        Prediction prediction = new Prediction(getTrainSet(passName));
+        Prediction prediction = new Prediction(getTrainSet(passName), features);
         Statistic inputData = getTestSet(passName);
         List<Date> dates = inputData.getDatesToCount();
         Vector errors = Vector.zero(dates.size());
         int i = 0;
         for(Date date : dates){
-            double error = inputData.getBeforeBorderValueForDate(date) - prediction.getPredictionValueForDate(date);
+            double error = inputData.getBeforeBorderValueForDate(date) - prediction.getPredictionValueForDate(date, inputData);
             errors.set(i, error);
             i++;
         }
 
         return errors;
     }
-
-
 
 
 

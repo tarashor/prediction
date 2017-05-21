@@ -96,53 +96,67 @@ public class Statistic {
         List<Date> holidays = new ArrayList<>();
 
         Calendar calendar = Calendar.getInstance();
+
+        //NY
         //"1.1.2017"
-        calendar.set(2017, Calendar.JANUARY, 1);
+        calendar.set(2017, Calendar.JANUARY, 1, 0, 0, 0);
         holidays.add(calendar.getTime());
         //"2.1.2017"
-        calendar.set(2017, Calendar.JANUARY, 2);
+        calendar.set(2017, Calendar.JANUARY, 2, 0, 0, 0);
         holidays.add(calendar.getTime());
+
+        //Chrismas
         //"7.1.2017"
-        calendar.set(2017, Calendar.JANUARY, 7);
+        calendar.set(2017, Calendar.JANUARY, 7, 0, 0, 0);
         holidays.add(calendar.getTime());
         //"9.1.2017"
-        calendar.set(2017, Calendar.JANUARY, 9);
+        calendar.set(2017, Calendar.JANUARY, 9, 0, 0, 0);
         holidays.add(calendar.getTime());
+
         //"8.3.2017"
-        calendar.set(2017, Calendar.MARCH, 8);
+        calendar.set(2017, Calendar.MARCH, 8, 0, 0, 0);
         holidays.add(calendar.getTime());
+
+        //Easter
         //"16.04.2017"
-        calendar.set(2017, Calendar.APRIL, 16);
+        calendar.set(2017, Calendar.APRIL, 16, 0, 0, 0);
         holidays.add(calendar.getTime());
         //"17.04.2017"
-        calendar.set(2017, Calendar.APRIL, 17);
+        calendar.set(2017, Calendar.APRIL, 17, 0, 0, 0);
         holidays.add(calendar.getTime());
+
+        //Mays
         //"1.05.2017"
-        calendar.set(2017, Calendar.MAY, 1);
+        calendar.set(2017, Calendar.MAY, 1, 0, 0, 0);
         holidays.add(calendar.getTime());
         //"2.05.2017"
-        calendar.set(2017, Calendar.MAY, 2);
+        calendar.set(2017, Calendar.MAY, 2, 0, 0, 0);
         holidays.add(calendar.getTime());
         //"9.05.2017"
-        calendar.set(2017, Calendar.MAY, 9);
+        calendar.set(2017, Calendar.MAY, 9, 0, 0, 0);
         holidays.add(calendar.getTime());
+
+        //Green days
         //"4.06.2017"
-        calendar.set(2017, Calendar.JUNE, 4);
+        calendar.set(2017, Calendar.JUNE, 4, 0, 0, 0);
         holidays.add(calendar.getTime());
         //"5.06.2017"
-        calendar.set(2017, Calendar.JUNE, 5);
+        calendar.set(2017, Calendar.JUNE, 5, 0, 0, 0);
         holidays.add(calendar.getTime());
+
         //"28.06.2017"
-        calendar.set(2017, Calendar.JUNE, 28);
+        calendar.set(2017, Calendar.JUNE, 28, 0, 0, 0);
         holidays.add(calendar.getTime());
         //"24.8.2017"
-        calendar.set(2017, Calendar.AUGUST, 24);
+        calendar.set(2017, Calendar.AUGUST, 24, 0, 0, 0);
         holidays.add(calendar.getTime());
+
+
         //"14.10.2017"
-        calendar.set(2017, Calendar.OCTOBER, 14);
+        calendar.set(2017, Calendar.OCTOBER, 14, 0, 0, 0);
         holidays.add(calendar.getTime());
         //"16.10.2017"
-        calendar.set(2017, Calendar.OCTOBER, 16);
+        calendar.set(2017, Calendar.OCTOBER, 16, 0, 0, 0);
         holidays.add(calendar.getTime());
 
 
@@ -170,15 +184,27 @@ public class Statistic {
         return holidays;
     }
 
-    public static int getDaysToNextHolidayUkr(Date date) {
+    public static int getHoursToNextHolidayUkr(Date date) {
         TreeSet<Date> treeSet = new TreeSet<>(getHolidaysUkraine());
         Date nextHoliday = treeSet.ceiling(date);
-        return DateTimeUtility.getDaysBetweenDates(date, nextHoliday);
+        return DateTimeUtility.getHoursBetweenDates(date, nextHoliday);
     }
 
-    public static int getDaysToPrevHolidayUkr(Date date) {
+    public static int getHoursToPrevHolidayUkr(Date date) {
         TreeSet<Date> treeSet = new TreeSet<>(getHolidaysUkraine());
         Date prevHoliday = treeSet.floor(date);
-        return DateTimeUtility.getDaysBetweenDates(date, prevHoliday);
+        return DateTimeUtility.getHoursBetweenDates(date, prevHoliday) + 24;
+    }
+
+    public static int getHoursToNextHolidayPl(Date date) {
+        TreeSet<Date> treeSet = new TreeSet<>(getHolidaysPoland());
+        Date nextHoliday = treeSet.ceiling(date);
+        return DateTimeUtility.getHoursBetweenDates(date, nextHoliday);
+    }
+
+    public static int getHoursToPrevHolidayPl(Date date) {
+        TreeSet<Date> treeSet = new TreeSet<>(getHolidaysPoland());
+        Date prevHoliday = treeSet.floor(date);
+        return DateTimeUtility.getHoursBetweenDates(date, prevHoliday) + 24;
     }
 }
