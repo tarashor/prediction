@@ -11,7 +11,7 @@ public class PredictionBootApplicationTests {
 
 	@Test
 	public void contextLoads() {
-		// asdasdasdasdasdasd
-	}
+
+  }
 
 }
